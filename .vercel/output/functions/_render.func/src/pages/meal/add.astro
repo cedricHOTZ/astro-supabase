@@ -4,6 +4,10 @@ import Button from "../../components/common/Button.astro";
 import Layout from "../../layouts/Layout.astro";
 import { Meal } from "astro:db";
 
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
   const title = formData.get("title") as string;
@@ -11,16 +15,21 @@ if (Astro.request.method === "POST") {
   const image = formData.get("image") as File;
   const imageAlt = formData.get("imageAlt") as string;
   const authorName = formData.get("authorName") as string;
+
+  // Conversion de l'image en base64
   const arrayBuffer = await image.arrayBuffer();
   const imageBase64 = Buffer.from(arrayBuffer).toString("base64");
 
-  await db.insert(Meal).values({
-    title: title,
-    description: description,
-    published: new Date(),
-    image: `data:image/webp;base64,${imageBase64}`,
-    imageAlt: imageAlt,
-    authorName: authorName, // Assurez-vous que 'authorName' est un champ valide dans 'Meal'
+  // Insertion dans la base de données avec Prisma
+  await prisma.meal.create({
+    data: {
+      title: title,
+      description: description,
+      published: new Date(),
+      image: `data:image/webp;base64,${imageBase64}`,
+      imageAlt: imageAlt,
+      authorName: authorName, // Assurez-vous que 'authorName' est un champ valide dans votre modèle Prisma
+    },
   });
 
   return Astro.redirect("/");
@@ -36,7 +45,8 @@ if (Astro.request.method === "POST") {
         type="text"
         name="authorName"
         id="authorName"
-        placeholder="Ex: John Doe" />
+        placeholder="Ex: John Doe"
+      />
     </div>
     <div class="form-control">
       <label for="title">Titre</label>

@@ -10,5 +10,5 @@ export default defineConfig({
 //SSR
 output: 'server',
  adapter: vercel(),
-   integrations: [db()]
+  //  integrations: [db()]
 });

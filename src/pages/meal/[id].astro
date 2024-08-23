@@ -14,18 +14,29 @@ import Button from "../../components/common/Button.astro";
 //   });
 // }
 
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 const mealId = Astro.params.id;
 
 if (Astro.request.method === "POST") {
-  // Supprimer le repas directement sans utiliser authorId
-  await db.delete(Meal).where(eq(Meal.id, +mealId!));
+  // Supprimer le repas directement en utilisant Prisma
+  await prisma.meal.delete({
+    where: {
+      id: +mealId!,
+    },
+  });
   return Astro.redirect("/");
 }
 
 // Récupérer le repas directement depuis la table Meal
-const result = await db.select().from(Meal).where(eq(Meal.id, +mealId!));
+const meal = await prisma.meal.findUnique({
+  where: {
+    id: +mealId!,
+  },
+});
 
-if (!result || result.length === 0) {
+if (!meal) {
   return new Response(null, {
     status: 404,
     statusText: "Not found",
@@ -33,7 +44,6 @@ if (!result || result.length === 0) {
 }
 
 // Extraire les détails du repas, y compris le nom de l'auteur
-const meal = result[0]; // Accéder au premier élément du tableau
 const { title, description, image, imageAlt, authorName } = meal;
 
 // Assurez-vous que `authorName` est récupéré directement depuis Meal
