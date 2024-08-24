@@ -30,10 +30,24 @@ const $$MealList = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${maybeRenderHead()}<ul class="meal-list" data-astro-cid-r2tvoqnu> ${meals.map((meal) => renderTemplate`${renderComponent($$result, "MealCard", $$MealCard, { "meal": meal, "data-astro-cid-r2tvoqnu": true })}`)} </ul> `;
 }, "/Users/ced/Desktop/astro-prisma/src/components/meal/MealList.astro", void 0);
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ["query", "info", "warn", "error"]
+});
 
 const $$Index = createComponent(async ($$result, $$props, $$slots) => {
-  const meals = await prisma.meal.findMany();
+  const getMeals = async () => {
+    try {
+      const meals2 = await prisma.meal.findMany();
+      console.log("Meals fetched:", meals2);
+      return meals2;
+    } catch (error) {
+      console.error("Erreur lors de la r\xE9cup\xE9ration des repas :", error);
+      return [];
+    } finally {
+      await prisma.$disconnect();
+    }
+  };
+  const meals = await getMeals();
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Liste des plats" }, { "default": ($$result2) => renderTemplate` ${renderComponent($$result2, "Hero", $$Hero, {})} ${maybeRenderHead()}<h2>Liste des plats</h2> <p class="paragraph">
 Retrouvez la liste de nos délicieux plats proposés par la communauté.
 </p> ${renderComponent($$result2, "MeaLList", $$MealList, { "meals": meals })} ` })}`;

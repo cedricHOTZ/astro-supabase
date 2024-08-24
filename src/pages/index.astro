@@ -2,11 +2,12 @@
 import Hero from "../components/common/Hero.astro";
 import Layout from "../layouts/Layout.astro";
 import MeaLList from "../components/meal/MealList.astro";
-import prisma from "../prisma";
+import prisma from ".././prisma"
 
 const getMeals = async () => {
   try {
     const meals = await prisma.meal.findMany();
+    console.log("Meals fetched:", meals);
     return meals;
   } catch (error) {
     console.error("Erreur lors de la récupération des repas :", error);
