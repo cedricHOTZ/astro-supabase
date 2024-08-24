@@ -13,18 +13,35 @@ const $$id = createComponent(async ($$result, $$props, $$slots) => {
   const prisma = new PrismaClient();
   const mealId = Astro2.params.id;
   if (Astro2.request.method === "POST") {
-    await prisma.meal.delete({
+    try {
+      await prisma.meal.delete({
+        where: {
+          id: +mealId
+        }
+      });
+      return Astro2.redirect("/");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du repas :", error);
+      return new Response(null, {
+        status: 500,
+        statusText: "Erreur serveur"
+      });
+    }
+  }
+  let meal;
+  try {
+    meal = await prisma.meal.findUnique({
       where: {
         id: +mealId
       }
     });
-    return Astro2.redirect("/");
+  } catch (error) {
+    console.error("Erreur lors de la r\xE9cup\xE9ration du repas :", error);
+    return new Response(null, {
+      status: 500,
+      statusText: "Erreur serveur"
+    });
   }
-  const meal = await prisma.meal.findUnique({
-    where: {
-      id: +mealId
-    }
-  });
   if (!meal) {
     return new Response(null, {
       status: 404,

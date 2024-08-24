@@ -1,40 +1,46 @@
 ---
-import { db } from "astro:db";
+// Importation des modules nécessaires
 import Layout from "../../layouts/Layout.astro";
-import { Meal } from "astro:db";
-import { eq } from "astro:db";
 import Button from "../../components/common/Button.astro";
-
-// export async function getStaticPaths() {
-//   return meals.map((meal) => {
-//     return {
-//       params: { id: meal.id },
-//       props: meal,
-//     };
-//   });
-// }
-
 import { PrismaClient } from "@prisma/client";
 
+// Création d'une instance PrismaClient
 const prisma = new PrismaClient();
 const mealId = Astro.params.id;
 
 if (Astro.request.method === "POST") {
-  // Supprimer le repas directement en utilisant Prisma
-  await prisma.meal.delete({
+  try {
+    // Suppression du repas en utilisant Prisma
+    await prisma.meal.delete({
+      where: {
+        id: +mealId!,
+      },
+    });
+    return Astro.redirect("/");
+  } catch (error) {
+    console.error("Erreur lors de la suppression du repas :", error);
+    return new Response(null, {
+      status: 500,
+      statusText: "Erreur serveur",
+    });
+  }
+}
+
+// Récupération du repas depuis la base de données
+let meal;
+try {
+  meal = await prisma.meal.findUnique({
     where: {
       id: +mealId!,
     },
   });
-  return Astro.redirect("/");
+} catch (error) {
+  console.error("Erreur lors de la récupération du repas :", error);
+  return new Response(null, {
+    status: 500,
+    statusText: "Erreur serveur",
+  });
 }
-
-// Récupérer le repas directement depuis la table Meal
-const meal = await prisma.meal.findUnique({
-  where: {
-    id: +mealId!,
-  },
-});
 
 if (!meal) {
   return new Response(null, {
@@ -43,7 +49,7 @@ if (!meal) {
   });
 }
 
-// Extraire les détails du repas, y compris le nom de l'auteur
+// Extraction des détails du repas
 const { title, description, image, imageAlt, authorName } = meal;
 
 // Assurez-vous que `authorName` est récupéré directement depuis Meal

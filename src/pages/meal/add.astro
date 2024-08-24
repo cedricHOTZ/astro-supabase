@@ -9,30 +9,38 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 if (Astro.request.method === "POST") {
-  const formData = await Astro.request.formData();
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const image = formData.get("image") as File;
-  const imageAlt = formData.get("imageAlt") as string;
-  const authorName = formData.get("authorName") as string;
+  try {
+    const formData = await Astro.request.formData();
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const image = formData.get("image") as File;
+    const imageAlt = formData.get("imageAlt") as string;
+    const authorName = formData.get("authorName") as string;
 
-  // Conversion de l'image en base64
-  const arrayBuffer = await image.arrayBuffer();
-  const imageBase64 = Buffer.from(arrayBuffer).toString("base64");
+    // Conversion de l'image en base64
+    const arrayBuffer = await image.arrayBuffer();
+    const imageBase64 = Buffer.from(arrayBuffer).toString("base64");
 
-  // Insertion dans la base de données avec Prisma
-  await prisma.meal.create({
-    data: {
-      title: title,
-      description: description,
-      published: new Date(),
-      image: `data:image/webp;base64,${imageBase64}`,
-      imageAlt: imageAlt,
-      authorName: authorName, // Assurez-vous que 'authorName' est un champ valide dans votre modèle Prisma
-    },
-  });
+    // Insertion dans la base de données avec Prisma
+    await prisma.meal.create({
+      data: {
+        title: title,
+        description: description,
+        published: new Date(),
+        image: `data:image/webp;base64,${imageBase64}`,
+        imageAlt: imageAlt,
+        authorName: authorName, // Assurez-vous que 'authorName' est un champ valide dans votre modèle Prisma
+      },
+    });
 
-  return Astro.redirect("/");
+    return Astro.redirect("/");
+  } catch (error) {
+    console.error("Erreur lors de l'insertion du repas :", error);
+    return new Response("Erreur interne du serveur", { status: 500 });
+  } finally {
+    // Déconnexion de Prisma pour éviter les fuites de connexion
+    await prisma.$disconnect();
+  }
 }
 ---
 

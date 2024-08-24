@@ -3,7 +3,7 @@ import vercel from '@astrojs/vercel/serverless';
 import db from "@astrojs/db";
 import dotenv from 'dotenv';
 
-  // dotenv.config();
+ dotenv.config();
 
 // https://astro.build/config
 export default defineConfig({

@@ -1,10 +1,7 @@
 ---
 import Hero from "../components/common/Hero.astro";
 import Layout from "../layouts/Layout.astro";
-
 import MeaLList from "../components/meal/MealList.astro";
-import { db } from "astro:db";
-import { Meal } from "astro:db";
 import prisma from "../prisma";
 const meals = await prisma.meal.findMany();
 ---
