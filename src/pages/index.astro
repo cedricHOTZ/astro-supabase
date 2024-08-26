@@ -16,20 +16,20 @@ const getMeals = async () => {
   } finally {
     console.log("Disconnecting Prisma...");
     await prisma.$disconnect(); // Déconnexion de Prisma
-    console.log("Prisma disconnected.");
+    
   }
 };
 
 const meals = await getMeals();
 console.log("Meals for rendering:", meals);
 
-if (!meals || meals.length === 0) {
-  console.error("No meals found. Displaying 404.");
-  return new Response(null, {
-    status: 404,
-    statusText: "Not Found",
-  });
-}
+// if (!meals || meals.length === 0) {
+//   console.error("No meals found. Displaying 404.");
+//   return new Response(null, {
+//     status: 404,
+//     statusText: "Not Found",
+//   });
+// }
 ---
 
 <Layout title="Liste des plats">
