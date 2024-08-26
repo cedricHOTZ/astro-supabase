@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+      "prisma:generate": "prisma generate",
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+  
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "prisma db seed"
   },
