@@ -2,10 +2,11 @@
 import Hero from "../components/common/Hero.astro";
 import Layout from "../layouts/Layout.astro";
 import MeaLList from "../components/meal/MealList.astro";
-import prisma from "../prisma"
+import prisma from "../prisma";
 
 const getMeals = async () => {
   try {
+    console.log("Fetching meals...");
     const meals = await prisma.meal.findMany();
     console.log("Meals fetched:", meals);
     return meals;
@@ -13,11 +14,22 @@ const getMeals = async () => {
     console.error("Erreur lors de la récupération des repas :", error);
     return [];
   } finally {
+    console.log("Disconnecting Prisma...");
     await prisma.$disconnect(); // Déconnexion de Prisma
+    console.log("Prisma disconnected.");
   }
 };
 
 const meals = await getMeals();
+console.log("Meals for rendering:", meals);
+
+if (!meals || meals.length === 0) {
+  console.error("No meals found. Displaying 404.");
+  return new Response(null, {
+    status: 404,
+    statusText: "Not Found",
+  });
+}
 ---
 
 <Layout title="Liste des plats">
