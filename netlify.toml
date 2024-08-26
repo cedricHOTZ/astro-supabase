@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"   # Commande pour construire le projet
+  command = "npm run generate && npm run build"   # Commande pour construire le projet
   publish = "dist"            # Répertoire où les fichiers de build sont générés
   functions = "netlify/functions"  # Répertoire pour les fonctions serverless (si utilisé)
 
